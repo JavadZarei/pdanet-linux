@@ -28,6 +28,8 @@ jobs:
         run: xvfb-run -a python3 tests/ui_smoke.py
 
       - name: Build .deb
+        env:
+          MAINTAINER: "Javad Zarei <103689293+JavadZarei@users.noreply.github.com>"
         run: ./build-deb.sh
 
       - name: Lint package (informational)

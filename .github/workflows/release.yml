@@ -19,6 +19,8 @@ jobs:
           test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != version v${version}"; exit 1; }
 
       - name: Build
+        env:
+          MAINTAINER: "Javad Zarei <103689293+JavadZarei@users.noreply.github.com>"
         run: |
           sudo apt-get update
           ./build-deb.sh

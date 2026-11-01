@@ -5,7 +5,7 @@ Priority: optional
 Architecture: amd64
 Maintainer: @MAINTAINER@
 Installed-Size: @SIZE@
-Depends: python3 (>= 3.10), python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1 (>= 1.4), adb, dnscrypt-proxy, iproute2, curl, gawk, coreutils, libc-bin, systemd, systemd-resolved | systemd, pkexec | policykit-1
+Depends: python3 (>= 3.10), python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1 (>= 1.4), adb, dnscrypt-proxy, iproute2, curl, gawk, systemd, systemd-resolved | systemd, pkexec | policykit-1
 Recommends: redsocks, nftables
 Description: PdaNet+ USB tethering desktop client
  A native GTK4/libadwaita application that shares an Android phone's Internet

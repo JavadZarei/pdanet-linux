@@ -1,5 +1,0 @@
-#!/bin/sh
-# Intentionally does nothing to services, routes or DNS: removing or upgrading
-# the GUI must never tear down a working connection.
-set -e
-exit 0

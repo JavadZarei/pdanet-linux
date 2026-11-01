@@ -60,18 +60,17 @@ package is built from. Redistribution terms are therefore undefined; contact the
 project owner before distributing this package outside your own machines.
 COPY
 chmod 0644 "$STAGE/usr/share/doc/$PKG/copyright"
-cat > "$STAGE/usr/share/doc/$PKG/changelog.Debian" <<CHL
+cat > "$STAGE/usr/share/doc/$PKG/changelog" <<CHL
 $PKG ($VERSION) unstable; urgency=medium
 
   * Native GTK4/libadwaita desktop application for the existing PdaNet USB CLI.
 
  -- $MAINTAINER  $(date -u -d "@$EPOCH" -R)
 CHL
-gzip -9n "$STAGE/usr/share/doc/$PKG/changelog.Debian"
+gzip -9n "$STAGE/usr/share/doc/$PKG/changelog"
 
 # --- maintainer scripts and metadata
 install -m 0755 packaging/debian/postinst "$STAGE/DEBIAN/postinst"
-install -m 0755 packaging/debian/prerm    "$STAGE/DEBIAN/prerm"
 install -m 0755 packaging/debian/postrm   "$STAGE/DEBIAN/postrm"
 SIZE="$(du -sk --exclude=DEBIAN "$STAGE" | cut -f1)"
 sed -e "s/@VERSION@/$VERSION/" -e "s/@SIZE@/$SIZE/" -e "s|@MAINTAINER@|$MAINTAINER|" packaging/debian/control > "$STAGE/DEBIAN/control"
