@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+STATE=/var/lib/pdanet-linux
+CREATED="$STATE/created-files"
+
+case "$1" in
+remove|purge)
+    rm -rf /usr/lib/python3/dist-packages/pdanet_gui
+    if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+        systemctl daemon-reload || true
+    fi
+    command -v gtk-update-icon-cache >/dev/null 2>&1 && \
+        gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true
+    ;;
+esac
+
+if [ "$1" = "purge" ]; then
+    # Remove only configs this package created itself (recorded with their checksum)
+    # and that are still unmodified. Anything pre-existing (e.g. from the old
+    # install.sh) or edited by the user is kept.
+    if [ -f "$CREATED" ]; then
+        while read -r sum file; do
+            [ -n "$sum" ] && [ -n "$file" ] || continue
+            if [ -f "$file" ] && [ "$(md5sum < "$file" | cut -d' ' -f1)" = "$sum" ]; then
+                rm -f "$file"
+            fi
+        done < "$CREATED"
+    fi
+    rm -rf "$STATE"
+fi
+exit 0

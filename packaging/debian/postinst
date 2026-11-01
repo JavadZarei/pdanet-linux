@@ -1,0 +1,49 @@
+#!/bin/sh
+# Never overwrites existing configuration and never touches an active tunnel.
+set -e
+
+SHARE=/usr/share/pdanet-linux/etc
+STATE=/var/lib/pdanet-linux
+CREATED="$STATE/created-files"
+
+case "$1" in
+configure)
+    mkdir -p "$STATE"
+    touch "$CREATED"
+    # Safe migration: install shipped configs only where nothing exists yet.
+    for src in "$SHARE"/*; do
+        name=$(basename "$src")
+        dest="/etc/$name"
+        if [ -e "$dest" ]; then
+            if ! cmp -s "$src" "$dest"; then
+                echo "pdanet-linux: keeping your existing $dest (it differs from the packaged default)."
+            fi
+        else
+            cp -p "$src" "$dest"
+            # record checksum so purge can tell whether the file is still pristine
+            echo "$(md5sum < "$dest" | cut -d' ' -f1)  $dest" >> "$CREATED"
+        fi
+    done
+
+    if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+        systemctl daemon-reload || true   # reload unit files only; no service is started or restarted
+    fi
+    command -v gtk-update-icon-cache >/dev/null 2>&1 && \
+        gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true
+    command -v update-desktop-database >/dev/null 2>&1 && \
+        update-desktop-database -q /usr/share/applications 2>/dev/null || true
+    python3 -m compileall -q /usr/lib/python3/dist-packages/pdanet_gui 2>/dev/null || true
+
+    # Informational only.
+    if [ -d /run/pdanet-usb ]; then
+        echo "pdanet-linux: a PdaNet USB session is active; it was left untouched."
+    fi
+    for old in /home/*/.local/bin/pdanet; do
+        [ -e "$old" ] || continue
+        echo "pdanet-linux: found an older copy at $old (left untouched)."
+        echo "              The desktop app always uses /usr/bin/pdanet. Disconnect before"
+        echo "              switching the command line to the packaged version."
+    done
+    ;;
+esac
+exit 0

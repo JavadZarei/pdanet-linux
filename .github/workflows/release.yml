@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tag must match the package version
+        run: |
+          version="$(python3 -c 'import re; print(re.search(r"__version__ = \"([^\"]+)\"", open("gui/pdanet_gui/__init__.py").read()).group(1))')"
+          test "v${version}" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != version v${version}"; exit 1; }
+
+      - name: Build
+        run: |
+          sudo apt-get update
+          ./build-deb.sh
+          (cd dist && sha256sum *.deb > SHA256SUMS)
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=PdaNet
+Name[fa]=پدانت
+GenericName=USB Tethering
+GenericName[fa]=اینترنت‌گذاری USB
+Comment=Share your phone's Internet connection over USB
+Comment[fa]=استفاده از اینترنت گوشی از طریق کابل USB
+Exec=pdanet-gui
+Icon=org.pdanet.Desktop
+Terminal=false
+Categories=Network;GTK;
+Keywords=PdaNet;USB;Tethering;Internet;Android;
+StartupNotify=true
+StartupWMClass=org.pdanet.Desktop

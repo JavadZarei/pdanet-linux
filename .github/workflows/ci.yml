@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 xvfb dbus-x11 lintian
+
+      - name: Unit tests (fake system, no hardware)
+        run: python3 -m unittest discover -s tests/unit
+
+      - name: CLI tests
+        run: |
+          bash tests/usb-selection.sh
+          python3 libexec/pdanet-usb-helper --self-test
+
+      - name: GTK4 / libadwaita smoke test (real widgets under Xvfb)
+        run: xvfb-run -a python3 tests/ui_smoke.py
+
+      - name: Build .deb
+        run: ./build-deb.sh
+
+      - name: Lint package (informational)
+        run: lintian --no-tag-display-limit dist/*.deb || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pdanet-linux-deb
+          path: dist/*.deb
